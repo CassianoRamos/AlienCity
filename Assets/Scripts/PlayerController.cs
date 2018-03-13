@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour {
 	public float Velocidade;
 	public float ForcaPulo = 1000f;
 	[HideInInspector] public bool viradoDireita = true;
+	public bool jump;
 
 	public Image vida;
 	private MensagemControle MC;
@@ -31,9 +32,12 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		//Implementar Pulo Aqui! 
-	}
 
+		tocaChao = Physics2D.Linecast (transform.position, posPe.position, 1 << LayerMask.NameToLayer ("Ground"));
+		if ((Input.GetKeyDown("space"))&& tocaChao) {
+			jump = true;
+	}
+	}
 	void FixedUpdate()
 	{
 		float translationY = 0;
@@ -41,12 +45,29 @@ public class PlayerController : MonoBehaviour {
 		transform.Translate (translationX, translationY, 0);
 		transform.Rotate (0, 0, 0);
 		if (translationX != 0 && tocaChao) {
-			anim.SetTrigger ("corre");
+			anim.SetTrigger ("run armado");
 		} else {
-			anim.SetTrigger("parado");
+			anim.SetTrigger("stand armado");
 		}
 
-		//Programar o pulo Aqui! 
+			if (jump == true)
+			{
+				anim.SetTrigger("pula");
+			rb2d.AddForce(new Vector2(0f, ForcaPulo));
+				jump = false;
+			}
+
+		if (jump == false && translationX != 0 && tocaChao){
+			anim.SetTrigger ("run armado");
+		} else {
+			anim.SetTrigger("stand armado");
+		}			
+			if(translationX>0 && !viradoDireita) 
+			{
+				Flip(); 
+			}
+			else if (translationX < 0 && viradoDireita)
+				Flip (); 
 
 		if (translationX > 0 && !viradoDireita) {
 			Flip ();
@@ -72,4 +93,4 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 	
-}
+} 
