@@ -4,10 +4,10 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 
-	// Use this for initialization
+	//Variaveis de animação e objetos
 	private Animator anim;
 	private Rigidbody2D rb2d;
-
+	//Variaveis de verificação se player está tocando o chão
 	public Transform posPe;
 	[HideInInspector] public bool tocaChao = false;
 
@@ -16,11 +16,11 @@ public class PlayerController : MonoBehaviour {
 	public float ForcaPulo = 1000f;
 	[HideInInspector] public bool viradoDireita = true;
 	public bool jump;
-
+	//Variaveis de vida do player
 	public Image vida;
 	private MensagemControle MC;
-
-	private float tempodetiro = 0.2f;
+	//Declaração da variaveis de tiro
+	private float tempodetiro = 0.1f;
 	private float controledetiro = 0f;
 	public Transform posicaotiro;
 	public GameObject tiro;
@@ -39,43 +39,49 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		//Verifica se p player está tocando o chão
+		//Verifica se o player está tocando o chão
 		tocaChao = Physics2D.Linecast (transform.position, posPe.position, 1 << LayerMask.NameToLayer ("Ground"));
 		if ((Input.GetKeyDown("space"))&& tocaChao) {
 			jump = true;
 				}
+        //Verifica se o tiro ja foi efetuado e controla o tempo até outro ser disparado
 		if (controledetiro > 0) {
 			controledetiro -= Time.deltaTime;
 		}
+		//Determina a tecla que dispara o tiro 
 		if (Input.GetKeyDown ("j")) {
 			Tiro ();
+			//Determina intervalo entre os tiros
 			controledetiro = tempodetiro;
 		}
 	}
 	void FixedUpdate()
 	{
+		//Movimentação do personagem
 		float translationY = 0;
 		float translationX = Input.GetAxis ("Horizontal") * Velocidade;
 		transform.Translate (translationX, translationY, 0);
 		transform.Rotate (0, 0, 0);
+		//Define as animações que serão feitas
 		if (translationX != 0 && tocaChao) {
 			anim.SetTrigger ("run armado");
 		} else {
 			anim.SetTrigger("stand armado");
 		}
-
+		//Chama a animação do pulo e define sua força
 			if (jump == true)
 			{
 				anim.SetTrigger("pula");
 			rb2d.AddForce(new Vector2(0f, ForcaPulo));
 				jump = false;
 			}
-
+		//Chama as animações pós-pulo
 		if (jump == false && translationX != 0 && tocaChao){
 			anim.SetTrigger ("run armado");
 		} else {
 			anim.SetTrigger("stand armado");
 		}			
+		//Define a direção ao qual o player está posicionado
 			if(translationX>0 && !viradoDireita) 
 			{
 				Flip(); 
@@ -90,6 +96,7 @@ public class PlayerController : MonoBehaviour {
 		}
 
 	}
+	//Faz o personagem andar para as duas direções
 	void Flip()
 	{
 		viradoDireita = !viradoDireita;
@@ -97,7 +104,7 @@ public class PlayerController : MonoBehaviour {
 		escala.x *= -1;
 		transform.localScale = escala;
 	}
-
+	//Método de dano do player
 	public void SubtraiVida()
 	{
 		vida.fillAmount-=0.1f;
@@ -106,12 +113,13 @@ public class PlayerController : MonoBehaviour {
 			Destroy(gameObject);
 		}
 	}
+	//Método de instanciação do prefab tiro
 	void Tiro(){
 		if (controledetiro <= 0f) {
 			if (tiro != null) {
 				var clonetiro = Instantiate (tiro, posicaotiro.position, Quaternion.identity) as GameObject;
 				clonetiro.transform.localScale = this.transform.localScale;
-				Destroy (clonetiro,20f);
+				Destroy (clonetiro,10f);
 
 			}
 		}
