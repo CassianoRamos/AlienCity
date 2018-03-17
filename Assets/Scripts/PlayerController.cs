@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour {
 	public Transform posPe;
 	[HideInInspector] public bool tocaChao = false;
 
-
+	//Declaração da variaveis do pulo
 	public float Velocidade;
 	public float ForcaPulo = 1000f;
 	[HideInInspector] public bool viradoDireita = true;
@@ -19,6 +19,13 @@ public class PlayerController : MonoBehaviour {
 
 	public Image vida;
 	private MensagemControle MC;
+
+	private float tempodetiro = 0.2f;
+	private float controledetiro = 0f;
+	public Transform posicaotiro;
+	public GameObject tiro;
+
+
 
 	void Start () {
 		anim = GetComponent<Animator> ();
@@ -32,11 +39,18 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+		//Verifica se p player está tocando o chão
 		tocaChao = Physics2D.Linecast (transform.position, posPe.position, 1 << LayerMask.NameToLayer ("Ground"));
 		if ((Input.GetKeyDown("space"))&& tocaChao) {
 			jump = true;
-	}
+				}
+		if (controledetiro > 0) {
+			controledetiro -= Time.deltaTime;
+		}
+		if (Input.GetKeyDown ("j")) {
+			Tiro ();
+			controledetiro = tempodetiro;
+		}
 	}
 	void FixedUpdate()
 	{
@@ -90,6 +104,16 @@ public class PlayerController : MonoBehaviour {
 		if (vida.fillAmount <= 0) {
 			MC.GameOver();
 			Destroy(gameObject);
+		}
+	}
+	void Tiro(){
+		if (controledetiro <= 0f) {
+			if (tiro != null) {
+				var clonetiro = Instantiate (tiro, posicaotiro.position, Quaternion.identity) as GameObject;
+				clonetiro.transform.localScale = this.transform.localScale;
+				Destroy (clonetiro, 1f);
+
+			}
 		}
 	}
 	
