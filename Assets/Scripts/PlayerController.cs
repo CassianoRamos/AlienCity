@@ -11,13 +11,21 @@ public class PlayerController : MonoBehaviour {
 	public Transform posPe;
 	[HideInInspector] public bool tocaChao = false;
 
-
+	//Declaração da variaveis do pulo
 	public float Velocidade;
 	public float ForcaPulo = 1000f;
 	[HideInInspector] public bool viradoDireita = true;
+	public bool jump;
 
 	public Image vida;
 	private MensagemControle MC;
+
+	private float tempodetiro = 0.2f;
+	private float controledetiro = 0f;
+	public Transform posicaotiro;
+	public GameObject tiro;
+
+
 
 	void Start () {
 		anim = GetComponent<Animator> ();
@@ -31,9 +39,19 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		//Implementar Pulo Aqui! 
+		//Verifica se p player está tocando o chão
+		tocaChao = Physics2D.Linecast (transform.position, posPe.position, 1 << LayerMask.NameToLayer ("Ground"));
+		if ((Input.GetKeyDown("space"))&& tocaChao) {
+			jump = true;
+				}
+		if (controledetiro > 0) {
+			controledetiro -= Time.deltaTime;
+		}
+		if (Input.GetKeyDown ("j")) {
+			Tiro ();
+			controledetiro = tempodetiro;
+		}
 	}
-
 	void FixedUpdate()
 	{
 		float translationY = 0;
@@ -41,12 +59,29 @@ public class PlayerController : MonoBehaviour {
 		transform.Translate (translationX, translationY, 0);
 		transform.Rotate (0, 0, 0);
 		if (translationX != 0 && tocaChao) {
-			anim.SetTrigger ("corre");
+			anim.SetTrigger ("run armado");
 		} else {
-			anim.SetTrigger("parado");
+			anim.SetTrigger("stand armado");
 		}
 
-		//Programar o pulo Aqui! 
+			if (jump == true)
+			{
+				anim.SetTrigger("pula");
+			rb2d.AddForce(new Vector2(0f, ForcaPulo));
+				jump = false;
+			}
+
+		if (jump == false && translationX != 0 && tocaChao){
+			anim.SetTrigger ("run armado");
+		} else {
+			anim.SetTrigger("stand armado");
+		}			
+			if(translationX>0 && !viradoDireita) 
+			{
+				Flip(); 
+			}
+			else if (translationX < 0 && viradoDireita)
+				Flip (); 
 
 		if (translationX > 0 && !viradoDireita) {
 			Flip ();
@@ -71,5 +106,15 @@ public class PlayerController : MonoBehaviour {
 			Destroy(gameObject);
 		}
 	}
+	void Tiro(){
+		if (controledetiro <= 0f) {
+			if (tiro != null) {
+				var clonetiro = Instantiate (tiro, posicaotiro.position, Quaternion.identity) as GameObject;
+				clonetiro.transform.localScale = this.transform.localScale;
+				Destroy (clonetiro,20f);
+
+			}
+		}
+	}
 	
-}
+} 
