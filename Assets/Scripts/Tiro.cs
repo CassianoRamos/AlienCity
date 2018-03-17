@@ -11,7 +11,12 @@ public class Tiro : MonoBehaviour {
 		rigidbodytiro = GetComponent<Rigidbody2D>();
 		rigidbodytiro.velocity = speed * this.transform.localScale.x;
 		anim.SetTrigger("tiro");
-		Destroy(gameObject,1f);
+	}
+	void OnTriggerEnter2D(Collider2D objeto)
+	{
+		if (objeto.gameObject.tag == "Chao") {
+			Destroy (gameObject);
+		}
 	}
 }
 

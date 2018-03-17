@@ -111,7 +111,7 @@ public class PlayerController : MonoBehaviour {
 			if (tiro != null) {
 				var clonetiro = Instantiate (tiro, posicaotiro.position, Quaternion.identity) as GameObject;
 				clonetiro.transform.localScale = this.transform.localScale;
-				Destroy (clonetiro, 1f);
+				Destroy (clonetiro,20f);
 
 			}
 		}
