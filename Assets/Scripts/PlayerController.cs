@@ -24,12 +24,19 @@ public class PlayerController : MonoBehaviour {
 	private float controledetiro = 0f;
 	public Transform posicaotiro;
 	public GameObject tiro;
-
-
+	//Variaveis da troca de armas
+	public GameObject arma2;
+	public GameObject arma21;
+	public bool armas;
+	public bool armas1;
+	public GameObject Arma1;
+	public GameObject Arma2;
 
 	void Start () {
 		anim = GetComponent<Animator> ();
 		rb2d = GetComponent<Rigidbody2D> ();
+		arma21.gameObject.SetActive (false);
+		arma2.gameObject.SetActive (false);
 
 		GameObject mensagemControleObject = GameObject.FindWithTag ("MensagemControle");
 		if (mensagemControleObject != null) {
@@ -54,6 +61,16 @@ public class PlayerController : MonoBehaviour {
 			//Determina intervalo entre os tiros
 			controledetiro = tempodetiro;
 		}
+		//faz troca de variaveis conforme o botao que foi pressionado
+		if (Input.GetKeyDown ("1")) {
+			armas = true;
+			armas1 = false;
+		} 
+		if (Input.GetKeyDown ("2")) {
+			armas1 = true;
+			armas = false;
+		} 
+
 	}
 	void FixedUpdate()
 	{
@@ -65,37 +82,55 @@ public class PlayerController : MonoBehaviour {
 		//Define as animações que serão feitas
 		if (translationX != 0 && tocaChao) {
 			anim.SetTrigger ("run armado");
+
 		} else {
-			anim.SetTrigger("stand armado");
+			anim.SetTrigger ("stand armado");
 		}
+
 		//Chama a animação do pulo e define sua força
-			if (jump == true)
-			{
-				anim.SetTrigger("pula");
-			rb2d.AddForce(new Vector2(0f, ForcaPulo));
-				jump = false;
-			}
+		if (jump == true) {
+			anim.SetTrigger ("pula");
+			rb2d.AddForce (new Vector2 (0f, ForcaPulo));
+			jump = false;
+		}
 		//Chama as animações pós-pulo
-		if (jump == false && translationX != 0 && tocaChao){
+		if (jump == false && translationX != 0 && tocaChao) {
 			anim.SetTrigger ("run armado");
+
 		} else {
-			anim.SetTrigger("stand armado");
+			anim.SetTrigger ("stand armado");
+
 		}			
 		//Define a direção ao qual o player está posicionado
-			if(translationX>0 && !viradoDireita) 
-			{
-				Flip(); 
-			}
-			else if (translationX < 0 && viradoDireita)
-				Flip (); 
+		if (translationX > 0 && !viradoDireita) {
+			Flip (); 
+		} else if (translationX < 0 && viradoDireita)
+			Flip (); 
 
 		if (translationX > 0 && !viradoDireita) {
 			Flip ();
 		} else if (translationX < 0 && viradoDireita) {
-			Flip();
+			Flip ();
+		  }
+		//Troca a visibilidade das armas comforme as condições de parado ou correndo 
+		if (armas == true && translationX != 0 && tocaChao) {
+				arma21.gameObject.SetActive (false);
+				arma2.gameObject.SetActive (true);
+			armas1 = false;
+			} 
+		else if (armas == true && translationX == 0 && tocaChao){
+				arma21.gameObject.SetActive (true);
+				arma2.gameObject.SetActive (false);
+			}
+		//Faz troca de visibilidade entre arma 1 e arma 2
+		if (armas1 == true) {
+			arma21.gameObject.SetActive (false);
+			arma2.gameObject.SetActive (false);
+			armas = false;
 		}
-
 	}
+
+
 	//Faz o personagem andar para as duas direções
 	void Flip()
 	{
@@ -120,9 +155,9 @@ public class PlayerController : MonoBehaviour {
 				var clonetiro = Instantiate (tiro, posicaotiro.position, Quaternion.identity) as GameObject;
 				clonetiro.transform.localScale = this.transform.localScale;
 				Destroy (clonetiro,10f);
-
 			}
 		}
 	}
-	
-} 
+		
+}
+
